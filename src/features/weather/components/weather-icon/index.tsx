@@ -1,9 +1,7 @@
 import CloudRoundedIcon from "@mui/icons-material/CloudRounded";
 import { Box } from "@mui/material";
-import {
-  getWeatherVisual,
-  WEATHER_ICON_FRAME_SIZE_OFFSET,
-} from "./constants";
+import { getWeatherVisual } from "@/features/weather/utils/weather-visual";
+import { WEATHER_ICON_FRAME_SIZE_OFFSET } from "./constants";
 import { getWeatherIconStyles } from "./styles";
 
 type WeatherIconProps = {

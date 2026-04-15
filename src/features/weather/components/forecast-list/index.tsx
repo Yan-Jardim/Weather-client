@@ -2,6 +2,7 @@ import { Box, Stack, Typography } from "@mui/material";
 import WeatherIcon from "@/features/weather/components/weather-icon";
 import { ForecastDay } from "@/features/weather/types";
 import {
+  formatPercentage,
   formatShortDateLabel,
   formatTemperature,
   formatWeekdayLabel,
@@ -53,7 +54,7 @@ export default function ForecastList({
                 {`\u00b0${unitSymbol}`}
               </Typography>
               <Typography sx={styles.precipitation}>
-                {`${Math.round(day.precipitationChance)}% ${FORECAST_LIST_COPY.precipitationSuffix}`}
+                {`${formatPercentage(day.precipitationChance)} ${FORECAST_LIST_COPY.precipitationSuffix}`}
               </Typography>
             </Stack>
           </Box>

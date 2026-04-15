@@ -72,3 +72,15 @@ export function formatTemperature(
 
   return `${roundedValue}`;
 }
+
+export function formatPercentage(value: number) {
+  return `${Math.round(value)}%`;
+}
+
+export function formatPressure(value: number) {
+  return `${Math.round(value)} hPa`;
+}
+
+export function formatWindSpeed(value: number, unit: string) {
+  return `${Math.round(value)} ${unit}`;
+}

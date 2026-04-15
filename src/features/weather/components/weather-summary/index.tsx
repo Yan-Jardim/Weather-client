@@ -6,12 +6,12 @@ import {
   formatClockTime,
   formatTemperature,
 } from "@/features/weather/utils/formatters";
-import { getWeatherLabel } from "@/features/weather/utils/weather-code";
 import {
   getWeatherDetailItems,
   getWeatherHighlightItems,
-  WEATHER_SUMMARY_COPY,
-} from "./constants";
+} from "@/features/weather/utils/weather-summary";
+import { getWeatherLabel } from "@/features/weather/utils/weather-code";
+import { WEATHER_SUMMARY_COPY } from "./constants";
 import { getWeatherSummaryStyles } from "./styles";
 
 type WeatherSummaryProps = {

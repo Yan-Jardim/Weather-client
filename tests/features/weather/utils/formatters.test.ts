@@ -4,9 +4,12 @@ import {
   formatCityLabel,
   formatCityMetaLabel,
   formatClockTime,
+  formatPercentage,
+  formatPressure,
   formatShortDateLabel,
   formatTemperature,
   formatWeekdayLabel,
+  formatWindSpeed,
   normalizeSearchTerm,
 } from "@/features/weather/utils/formatters";
 
@@ -46,5 +49,11 @@ describe("formatters", () => {
     expect(formatTemperature(26.4)).toBe("26");
     expect(formatTemperature(26.4, { withPlus: true })).toBe("+26");
     expect(formatTemperature(-3.2, { withPlus: true })).toBe("-3");
+  });
+
+  it("formats percentages, pressure and wind speed consistently", () => {
+    expect(formatPercentage(79.6)).toBe("80%");
+    expect(formatPressure(1013.6)).toBe("1014 hPa");
+    expect(formatWindSpeed(18.4, "mph")).toBe("18 mph");
   });
 });

@@ -20,6 +20,10 @@ import { useWeather } from "@/features/weather/hooks/use-weather";
 import { reverseGeocodeLocation } from "@/features/weather/lib/weather-api";
 import { CityOption, TemperatureUnit } from "@/features/weather/types";
 import {
+  createLocationFallback,
+  getCurrentPosition,
+} from "@/features/weather/utils/location";
+import {
   readRecentCities,
   saveRecentCity,
 } from "@/features/weather/utils/recent-cities";
@@ -31,31 +35,6 @@ import {
   WEATHER_DASHBOARD_COPY,
 } from "./constants";
 import { getWeatherDashboardStyles } from "./styles";
-
-function getCurrentPosition() {
-  return new Promise<GeolocationPosition>((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(
-      resolve,
-      reject,
-      GEOLOCATION_OPTIONS,
-    );
-  });
-}
-
-function createLocationFallback(
-  latitude: number,
-  longitude: number,
-): CityOption {
-  return {
-    id:
-      Math.round(Math.abs(latitude) * 10_000) * 1_000_000 +
-      Math.round(Math.abs(longitude) * 10_000),
-    name: WEATHER_DASHBOARD_COPY.currentLocation,
-    latitude,
-    longitude,
-    country: "Atual",
-  };
-}
 
 export default function WeatherDashboard() {
   const [unit, setUnit] = useState<TemperatureUnit>("celsius");
@@ -103,7 +82,7 @@ export default function WeatherDashboard() {
     setIsLocating(true);
 
     try {
-      const position = await getCurrentPosition();
+      const position = await getCurrentPosition(GEOLOCATION_OPTIONS);
       const { latitude, longitude } = position.coords;
 
       try {
@@ -114,7 +93,14 @@ export default function WeatherDashboard() {
 
         handleCitySelect(location);
       } catch {
-        handleCitySelect(createLocationFallback(latitude, longitude));
+        handleCitySelect(
+          createLocationFallback({
+            latitude,
+            longitude,
+            name: WEATHER_DASHBOARD_COPY.currentLocation,
+            country: "Atual",
+          }),
+        );
         setLocationError(WEATHER_DASHBOARD_COPY.reverseGeocodeFallback);
       }
     } catch {

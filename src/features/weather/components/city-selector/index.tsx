@@ -8,8 +8,11 @@ import { CityOption } from "@/features/weather/types";
 import {
   formatCityLabel,
   formatCityMetaLabel,
-  normalizeSearchTerm,
 } from "@/features/weather/utils/formatters";
+import {
+  buildCityOptions,
+  createRecentCityKeySet,
+} from "@/features/weather/utils/city-selector";
 import { getCityStorageKey } from "@/features/weather/utils/recent-cities";
 import {
   CITY_SEARCH_MIN_LENGTH,
@@ -24,10 +27,6 @@ type CitySelectorProps = {
   isDarkMode?: boolean;
 };
 
-function getCityKey(city: CityOption) {
-  return getCityStorageKey(city);
-}
-
 export default function CitySelector({
   selectedCity,
   onSelectCity,
@@ -39,19 +38,16 @@ export default function CitySelector({
   const styles = getCitySelectorStyles(isDarkMode);
 
   const options = useMemo(() => {
-    const normalizedSearch = normalizeSearchTerm(search);
-    const matchingRecentCities = recentCities.filter((city) =>
-      normalizeSearchTerm(formatCityLabel(city)).includes(normalizedSearch),
-    );
-    const mergedOptions = [selectedCity, ...matchingRecentCities, ...data];
-
-    return Array.from(
-      new Map(mergedOptions.map((city) => [getCityKey(city), city])).values(),
-    );
+    return buildCityOptions({
+      selectedCity,
+      recentCities,
+      fetchedCities: data,
+      search,
+    });
   }, [data, recentCities, search, selectedCity]);
 
   const recentCityKeys = useMemo(
-    () => new Set(recentCities.map((city) => getCityKey(city))),
+    () => createRecentCityKeySet(recentCities),
     [recentCities],
   );
 
@@ -61,7 +57,7 @@ export default function CitySelector({
       openOnFocus
       options={options}
       filterOptions={(optionList) => optionList}
-      getOptionKey={(option) => getCityKey(option)}
+      getOptionKey={(option) => getCityStorageKey(option)}
       slotProps={{
         paper: {
           sx: styles.paper,
@@ -97,7 +93,7 @@ export default function CitySelector({
       loading={isLoading}
       renderOption={(props, option) => {
         const { key, ...optionProps } = props;
-        const isRecentOption = recentCityKeys.has(getCityKey(option));
+        const isRecentOption = recentCityKeys.has(getCityStorageKey(option));
 
         return (
           <Box
