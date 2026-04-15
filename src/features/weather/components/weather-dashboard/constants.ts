@@ -16,7 +16,7 @@ export const GEOLOCATION_OPTIONS: PositionOptions = {
 };
 
 export const WEATHER_DASHBOARD_COPY = {
-  title: "Painel do tempo com cara de produto.",
+  title: "Painel do tempo.",
   currentLocation: "Minha localizacao",
   locating: "Localizando...",
   refreshing: "Atualizando painel...",
