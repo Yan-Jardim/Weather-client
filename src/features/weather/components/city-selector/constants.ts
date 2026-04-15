@@ -1,4 +1,5 @@
 export const CITY_SEARCH_MIN_LENGTH = 2;
+export const CITY_SEARCH_DEBOUNCE_MS = 300;
 
 export const CITY_SELECTOR_COPY = {
   label: "Cidade",

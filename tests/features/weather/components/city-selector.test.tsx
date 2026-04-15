@@ -1,7 +1,8 @@
 "use client";
 
-import { fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { CITY_SEARCH_DEBOUNCE_MS } from "@/features/weather/components/city-selector/constants";
 
 const { useCitySearchMock } = vi.hoisted(() => ({
   useCitySearchMock: vi.fn(),
@@ -116,6 +117,14 @@ afterEach(() => {
   useCitySearchMock.mockReset();
 });
 
+beforeEach(() => {
+  vi.useFakeTimers();
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe("CitySelector", () => {
   it("renders recent cities and selects a searched city", () => {
     useCitySearchMock.mockImplementation((term: string) => ({
@@ -164,6 +173,12 @@ describe("CitySelector", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "type-search" }));
 
+    expect(useCitySearchMock).toHaveBeenLastCalledWith("");
+
+    act(() => {
+      vi.advanceTimersByTime(CITY_SEARCH_DEBOUNCE_MS);
+    });
+
     expect(useCitySearchMock).toHaveBeenLastCalledWith("sal");
     expect(screen.getByText("Salvador")).toBeInTheDocument();
 
@@ -198,7 +213,21 @@ describe("CitySelector", () => {
     fireEvent.click(screen.getByRole("button", { name: "type-search" }));
     expect(screen.getByText("Buscando cidades...")).toBeInTheDocument();
 
+    act(() => {
+      vi.advanceTimersByTime(CITY_SEARCH_DEBOUNCE_MS);
+    });
+
+    expect(useCitySearchMock).toHaveBeenLastCalledWith("sal");
+
     fireEvent.click(screen.getByRole("button", { name: "clear-search" }));
+    expect(
+      screen.queryByText("Buscando cidades..."),
+    ).not.toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(CITY_SEARCH_DEBOUNCE_MS);
+    });
+
     expect(useCitySearchMock).toHaveBeenLastCalledWith("");
 
     fireEvent.click(screen.getByRole("button", { name: "reset-search" }));

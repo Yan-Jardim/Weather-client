@@ -3,6 +3,7 @@
 import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
 import { Autocomplete, Box, CircularProgress, Stack, TextField, Typography } from "@mui/material";
 import { useMemo, useState } from "react";
+import { useDebouncedValue } from "@/features/weather/hooks/use-debounced-value";
 import { useCitySearch } from "@/features/weather/hooks/use-weather";
 import { CityOption } from "@/features/weather/types";
 import {
@@ -15,6 +16,7 @@ import {
 } from "@/features/weather/utils/city-selector";
 import { getCityStorageKey } from "@/features/weather/utils/recent-cities";
 import {
+  CITY_SEARCH_DEBOUNCE_MS,
   CITY_SEARCH_MIN_LENGTH,
   CITY_SELECTOR_COPY,
 } from "./constants";
@@ -34,17 +36,24 @@ export default function CitySelector({
   isDarkMode = false,
 }: CitySelectorProps) {
   const [search, setSearch] = useState("");
-  const { data = [], isLoading } = useCitySearch(search);
+  const debouncedSearch = useDebouncedValue(search, CITY_SEARCH_DEBOUNCE_MS);
+  const { data = [], isLoading } = useCitySearch(debouncedSearch);
   const styles = getCitySelectorStyles(isDarkMode);
+  const isSearchEligible = search.length >= CITY_SEARCH_MIN_LENGTH;
+  const isWaitingForSearch = isSearchEligible && search !== debouncedSearch;
+  const isSearching = isSearchEligible && (isLoading || isWaitingForSearch);
+  const fetchedCities = useMemo(() => {
+    return debouncedSearch === search && isSearchEligible ? data : [];
+  }, [data, debouncedSearch, isSearchEligible, search]);
 
   const options = useMemo(() => {
     return buildCityOptions({
       selectedCity,
       recentCities,
-      fetchedCities: data,
+      fetchedCities,
       search,
     });
-  }, [data, recentCities, search, selectedCity]);
+  }, [fetchedCities, recentCities, search, selectedCity]);
 
   const recentCityKeys = useMemo(
     () => createRecentCityKeySet(recentCities),
@@ -69,7 +78,7 @@ export default function CitySelector({
       getOptionLabel={(option) => formatCityLabel(option)}
       value={selectedCity}
       noOptionsText={
-        search.length < CITY_SEARCH_MIN_LENGTH
+        !isSearchEligible
           ? CITY_SELECTOR_COPY.emptySearch
           : CITY_SELECTOR_COPY.noResults
       }
@@ -90,7 +99,7 @@ export default function CitySelector({
         }
       }}
       isOptionEqualToValue={(option, value) => option.id === value.id}
-      loading={isLoading}
+      loading={isSearching}
       renderOption={(props, option) => {
         const { key, ...optionProps } = props;
         const isRecentOption = recentCityKeys.has(getCityStorageKey(option));
@@ -132,7 +141,7 @@ export default function CitySelector({
               ...params.slotProps.input,
               endAdornment: (
                 <>
-                  {isLoading ? <CircularProgress size={18} /> : null}
+                  {isSearching ? <CircularProgress size={18} /> : null}
                   {params.slotProps.input?.endAdornment}
                 </>
               ),
