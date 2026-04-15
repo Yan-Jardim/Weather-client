@@ -1,36 +1,166 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Weather Client
 
-## Getting Started
+Aplicação de clima desenvolvida com `Next.js`, com foco em uma interface limpa, responsiva e consistente, utilizando `MUI` como base visual e arquitetura orientada por feature.
 
-First, run the development server:
+## Visão Geral
+
+O projeto exibe clima atual e previsão para 7 dias a partir de uma cidade selecionada ou da localização atual do usuário. A interface foi estruturada como um dashboard, com destaque para temperatura, condição climática, métricas principais e previsão semanal.
+
+Principais pontos da aplicação:
+
+- busca de cidades com autocomplete
+- uso da localização atual com reverse geocoding
+- armazenamento de cidades recentes no `localStorage`
+- alternância de unidade entre `°C` e `°F`
+- conversão local de unidades sem nova requisição para a API
+- tema ajustado automaticamente com base em `isDay` da cidade selecionada
+
+## Stack
+
+- `Next.js 16.2.3` com App Router
+- `React 19`
+- `TypeScript`
+- `MUI` + `Emotion` para interface e estilização
+- `React Query` para busca e cache de dados
+- `Axios` para chamadas HTTP
+- `Vitest` + `Testing Library` + `happy-dom` para testes
+- `ESLint` para lint
+
+## Arquitetura
+
+O projeto mantém a página principal enxuta e concentra a implementação na feature `weather`.
+
+- [src/app](./src/app): layout, página principal, estilos globais e rota interna
+- [src/features/weather](./src/features/weather): implementação completa da feature de clima
+- [src/providers](./src/providers): providers globais da aplicação
+- [src/theme](./src/theme): tema MUI e controle de modo `day/night`
+- [tests](./tests): suíte de testes organizada fora de `src`
+
+Dentro da feature `weather`, os componentes seguem o padrão por componente:
+
+- `city-selector/index.tsx` + `styles.ts`
+- `forecast-list/index.tsx` + `styles.ts`
+- `unit-toggle/index.tsx` + `styles.ts`
+- `weather-dashboard/index.tsx` + `styles.ts`
+- `weather-icon/index.tsx` + `styles.ts`
+- `weather-summary/index.tsx` + `styles.ts`
+
+## Estrutura de Pastas
+
+```text
+src/
+  app/
+    api/
+      reverse-geocode/
+        route.ts
+    globals.css
+    layout.tsx
+    page.tsx
+  features/
+    weather/
+      components/
+      hooks/
+      lib/
+      utils/
+      types.ts
+  providers/
+    app-providers.tsx
+  theme/
+    app-theme.ts
+    theme-mode-provider.tsx
+
+tests/
+  app/
+  features/
+  providers/
+  theme/
+```
+
+## Fluxo da Aplicação
+
+- A página principal renderiza apenas o dashboard da feature `weather`
+- A busca de cidades utiliza a Open-Meteo Geocoding API
+- A previsão utiliza a Open-Meteo Forecast API
+- A geolocalização utiliza uma rota interna em `/api/reverse-geocode`
+- O reverse geocoding é resolvido com Nominatim / OpenStreetMap
+- As cidades recentes são persistidas no `localStorage`
+- A troca entre `°C` e `°F` acontece no cliente, sem nova chamada à API
+
+## Tema e Interface
+
+A interface utiliza `MUI` como base principal de estilização.
+
+- tema centralizado em [src/theme/app-theme.ts](./src/theme/app-theme.ts)
+- controle de modo em [src/theme/theme-mode-provider.tsx](./src/theme/theme-mode-provider.tsx)
+- estilos globais e ambientação visual em [src/app/globals.css](./src/app/globals.css)
+- fontes carregadas com `next/font`
+
+O projeto não utiliza Tailwind. A estilização é baseada em:
+
+- tema do `MUI`
+- prop `sx`
+- `styles.ts` por componente
+- CSS global apenas para base visual e animações leves
+
+## Como Executar
+
+Instale as dependências:
+
+```bash
+npm install
+```
+
+Execute o ambiente de desenvolvimento:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000) no navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts Disponíveis
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+npm test
+npm run test:watch
+```
 
-## Learn More
+## Testes
 
-To learn more about Next.js, take a look at the following resources:
+Os testes estão centralizados na pasta [tests](./tests) e cobrem:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- componentes da interface
+- hooks
+- utilitários
+- providers
+- tema
+- página principal
+- rota interna de reverse geocoding
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+A cobertura atual está acima do mínimo configurado no projeto:
 
-## Deploy on Vercel
+- `Statements: 96.93%`
+- `Branches: 93.16%`
+- `Functions: 96.47%`
+- `Lines: 96.77%`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+O threshold configurado no `Vitest` é de `80%` para todas as métricas principais.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Qualidade e Decisões Técnicas
+
+- arquitetura por feature preservada
+- `page.tsx` enxuto e com responsabilidade única
+- separação clara entre lógica, apresentação e estilos
+- organização dos componentes em `index.tsx + styles.ts`
+- suíte de testes isolada em `tests/`
+- interface pensada para manter simplicidade e boa leitura em desktop e mobile
+
+## APIs Utilizadas
+
+- [Open-Meteo Geocoding API](https://open-meteo.com/)
+- [Open-Meteo Forecast API](https://open-meteo.com/)
+- [Nominatim / OpenStreetMap](https://nominatim.org/)

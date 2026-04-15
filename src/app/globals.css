@@ -1,26 +1,112 @@
-@import "tailwindcss";
-
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-sans: var(--font-body);
+  --page-background:
+    radial-gradient(circle at 16% 14%, rgba(255, 229, 137, 0.42) 0%, transparent 22%),
+    radial-gradient(circle at 84% 18%, rgba(183, 219, 255, 0.38) 0%, transparent 22%),
+    linear-gradient(180deg, #88bbfd 0%, #6fa3eb 36%, #5d8ad0 100%);
+  --shell-glow-primary: rgba(255, 244, 194, 0.28);
+  --shell-glow-secondary: rgba(162, 209, 255, 0.22);
+  --page-color: #f8fbff;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html {
+  min-height: 100%;
+  background: #edf6ff;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html[data-theme="night"] {
+  background: #020307;
+  --page-background:
+    radial-gradient(circle at 22% 16%, rgba(135, 161, 255, 0.16) 0%, transparent 22%),
+    radial-gradient(circle at 78% 18%, rgba(112, 129, 255, 0.12) 0%, transparent 18%),
+    radial-gradient(circle at 50% 120%, rgba(42, 58, 102, 0.28) 0%, transparent 34%),
+    linear-gradient(180deg, #0a0d15 0%, #05070d 48%, #020307 100%);
+  --shell-glow-primary: rgba(122, 145, 255, 0.18);
+  --shell-glow-secondary: rgba(78, 94, 151, 0.14);
+  --page-color: #eef3ff;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--page-background);
+  color: var(--page-color);
+  transition:
+    background 260ms ease,
+    color 260ms ease;
+}
+
+.weather-shell {
+  position: relative;
+  overflow-x: hidden;
+}
+
+.weather-shell::before,
+.weather-shell::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(28px);
+  pointer-events: none;
+}
+
+.weather-shell::before {
+  top: 7vh;
+  left: -5vw;
+  width: 28vw;
+  height: 28vw;
+  min-width: 220px;
+  min-height: 220px;
+  background: var(--shell-glow-primary);
+}
+
+.weather-shell::after {
+  right: -6vw;
+  bottom: 12vh;
+  width: 26vw;
+  height: 26vw;
+  min-width: 180px;
+  min-height: 180px;
+  background: var(--shell-glow-secondary);
+}
+
+@keyframes weatherFloat {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(10px, -6px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes weatherPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.92;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.92;
+  }
+}
+
+.weather-float {
+  animation: weatherFloat 10s ease-in-out infinite;
+}
+
+.weather-float-delayed {
+  animation: weatherFloat 12s ease-in-out infinite 0.8s;
+}
+
+.weather-sheen {
+  animation: weatherPulse 5.5s ease-in-out infinite;
 }
